@@ -1,9 +1,10 @@
-package id.aria.notes
+package id.aria.notes.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import id.aria.notes.R
 
 class MainActivity : AppCompatActivity() {
 
