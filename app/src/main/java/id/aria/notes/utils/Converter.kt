@@ -1,7 +1,7 @@
 package id.aria.notes.utils
 
 import androidx.room.TypeConverter
-import id.aria.notes.data.model.Priority
+import id.aria.notes.data.models.Priority
 
 class Converter {
 

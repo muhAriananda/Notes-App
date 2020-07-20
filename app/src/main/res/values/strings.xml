@@ -16,9 +16,9 @@
     <string name="delete">Delete</string>
 
     <string-array name="priorities" >
-        <item>High Priority</item>
-        <item>Medium Priority</item>
-        <item>Low Priority</item>
+        <item>Low priority</item>
+        <item>Medium priority</item>
+        <item>High priority</item>
     </string-array>
 
 </resources>

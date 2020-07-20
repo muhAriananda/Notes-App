@@ -1,4 +1,4 @@
-package id.aria.notes.data.model
+package id.aria.notes.data.models
 
 enum class Priority {
     HIGH,

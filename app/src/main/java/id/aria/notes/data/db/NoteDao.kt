@@ -1,11 +1,8 @@
 package id.aria.notes.data.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import id.aria.notes.data.model.Note
+import androidx.room.*
+import id.aria.notes.data.models.Note
 
 @Dao
 interface NoteDao {
@@ -16,5 +13,12 @@ interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(note: Note)
 
+    @Update
+    suspend fun update(note: Note)
 
+    @Delete
+    suspend fun delete(note: Note)
+
+    @Query("DELETE FROM note_table")
+    suspend fun deleteAll()
 }
