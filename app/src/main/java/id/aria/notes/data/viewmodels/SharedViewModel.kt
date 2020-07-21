@@ -14,11 +14,15 @@ import id.aria.notes.data.models.Priority
 
 class SharedViewModel(application: Application) : AndroidViewModel(application) {
 
-    val emptyDatabase: MutableLiveData<Boolean> = MutableLiveData(true)
+    /**List Fragment */
+
+    val emptyDatabase: MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun checkIfDatabaseEmpty(notes: List<Note>) {
         emptyDatabase.value = notes.isEmpty()
     }
+
+    /**Update Fragment */
 
     val listener: AdapterView.OnItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -78,14 +82,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             else -> {
                 Priority.LOW
             }
-        }
-    }
-
-    fun parsePriorityToInt(priority: Priority): Int {
-        return when(priority) {
-            Priority.LOW -> 0
-            Priority.MEDIUM -> 1
-            Priority.HIGH -> 2
         }
     }
 }

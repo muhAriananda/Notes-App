@@ -1,63 +1,58 @@
 package id.aria.notes.ui.fragments.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import id.aria.notes.R
+import id.aria.notes.data.models.Note
 import id.aria.notes.data.viewmodels.NoteViewModel
 import id.aria.notes.data.viewmodels.SharedViewModel
-import kotlinx.android.synthetic.main.fragment_list.*
+import id.aria.notes.databinding.FragmentListBinding
+import id.aria.notes.utils.SwipeToDelete
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 
 class ListFragment : Fragment() {
 
     private val noteViewModel: NoteViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
+
+    private var _binding: FragmentListBinding? = null
+    private val binding get() = _binding!!
+
     private val adapter: ListAdapter by lazy { ListAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
+        //Set Menu
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_list, container, false)
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        //Data binding
+        _binding = FragmentListBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this
+        binding.mSharedViewModel = sharedViewModel
 
-        rv_notes.adapter = adapter
-        rv_notes.layoutManager = LinearLayoutManager(requireActivity())
+        //Setup RecyclerView
+        setupRecyclerView()
 
-        noteViewModel.getAllNotes.observe(viewLifecycleOwner, Observer { notes->
+        //Observer LiveData
+        noteViewModel.getAllNotes.observe(viewLifecycleOwner, Observer { notes ->
             sharedViewModel.checkIfDatabaseEmpty(notes)
             adapter.setData(notes)
         })
 
-        sharedViewModel.emptyDatabase.observe(viewLifecycleOwner, Observer {
-            showDatabaseEmptyView(it)
-        })
-
-        floatingActionButton.setOnClickListener {
-            findNavController().navigate(R.id.action_listFragment_to_addFragment)
-        }
-    }
-
-    private fun showDatabaseEmptyView(emptyDatabase: Boolean) {
-        if (emptyDatabase) {
-            img_no_data.visibility = View.VISIBLE
-            tv_no_data.visibility =View.VISIBLE
-        } else {
-            img_no_data.visibility = View.INVISIBLE
-            tv_no_data.visibility =View.INVISIBLE
-        }
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -71,15 +66,62 @@ class ListFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    //Alert Dialog and delete all Notes
     private fun deleteAll() {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setNegativeButton("No") { _, _->}
-        builder.setPositiveButton("Yes") {_, _->
+        builder.setNegativeButton("No") { _, _ -> }
+        builder.setPositiveButton("Yes") { _, _ ->
             noteViewModel.deleteAll()
-            Toast.makeText(requireContext(), "Successfully remove everything", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Successfully remove everything", Toast.LENGTH_SHORT)
+                .show()
         }
         builder.setTitle("Delete Everything")
         builder.setMessage("Are you sure want to delete everything?")
         builder.create().show()
+    }
+
+    private fun setupRecyclerView() {
+        val recyclerView = binding.rvNotes
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        recyclerView.itemAnimator = SlideInUpAnimator().apply {
+            addDuration = 300
+        }
+
+        //Set swipe to delete
+        swipeToDelete(recyclerView)
+    }
+
+    private fun swipeToDelete(recyclerView: RecyclerView) {
+        val swipeToDeleteCallback = object : SwipeToDelete() {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val noteToDelete = adapter.dataList[viewHolder.adapterPosition]
+                //Delete Note
+                noteViewModel.deleteNote(noteToDelete)
+                adapter.notifyItemRemoved(viewHolder.adapterPosition)
+
+                //Restore Delete
+                restoreNoteDelete(viewHolder.itemView, noteToDelete, viewHolder.adapterPosition)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun restoreNoteDelete(view: View, noteToDelete: Note, position: Int) {
+        val snackBar = Snackbar.make(
+            view,
+            "Deleted ${noteToDelete.title}",
+            Snackbar.LENGTH_LONG
+        )
+        snackBar.setAction("Undo") {
+            noteViewModel.insertNote(noteToDelete)
+        }
+        snackBar.show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

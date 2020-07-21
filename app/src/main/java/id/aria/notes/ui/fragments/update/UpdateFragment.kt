@@ -10,35 +10,36 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import id.aria.notes.R
 import id.aria.notes.data.models.Note
-import id.aria.notes.data.models.Priority
 import id.aria.notes.data.viewmodels.NoteViewModel
 import id.aria.notes.data.viewmodels.SharedViewModel
+import id.aria.notes.databinding.FragmentUpdateBinding
 import kotlinx.android.synthetic.main.fragment_update.*
 
 class UpdateFragment : Fragment() {
 
     private val args by navArgs<UpdateFragmentArgs>()
+
     private val sharedViewModel: SharedViewModel by viewModels()
     private val noteViewModel: NoteViewModel by viewModels()
+
+    private var _binding: FragmentUpdateBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        //Set Menu
         setHasOptionsMenu(true)
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_update, container, false)
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        //Data Binding
+        _binding = FragmentUpdateBinding.inflate(inflater, container, false)
+        binding.arg = args
 
-        val note = args.currentItem
-        edt_current_title.setText(note.title)
-        edt_current_description.setText(note.description)
-        spinner_current_priorities.setSelection(sharedViewModel.parsePriorityToInt(note.priority))
+        binding.spinnerCurrentPriorities.onItemSelectedListener = sharedViewModel.listener
 
-        spinner_current_priorities.onItemSelectedListener = sharedViewModel.listener
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -46,13 +47,14 @@ class UpdateFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.menu_update -> updateNote()
             R.id.menu_delete -> deleteNote()
         }
         return super.onOptionsItemSelected(item)
     }
 
+    //Update notes
     private fun updateNote() {
         val title = edt_current_title.text.toString()
         val description = edt_current_description.text.toString()
@@ -70,21 +72,31 @@ class UpdateFragment : Fragment() {
             Toast.makeText(requireContext(), "Update Successfully", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)
 
-        }else {
+        } else {
             Toast.makeText(requireContext(), "Please fill out fields", Toast.LENGTH_SHORT).show()
         }
     }
 
+    //Alert Dialog and for delete dialog
     private fun deleteNote() {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setNegativeButton("No") { _, _->}
-        builder.setPositiveButton("Yes") {_, _->
+        builder.setNegativeButton("No") { _, _ -> }
+        builder.setPositiveButton("Yes") { _, _ ->
             noteViewModel.deleteNote(args.currentItem)
-            Toast.makeText(requireContext(), "Successfully remove ${args.currentItem.title}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Successfully remove ${args.currentItem.title}",
+                Toast.LENGTH_SHORT
+            ).show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)
         }
         builder.setTitle("Delete ${args.currentItem.title}")
         builder.setMessage("Are you sure want to delete ${args.currentItem.title}?")
         builder.create().show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

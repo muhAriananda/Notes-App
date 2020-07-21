@@ -1,26 +1,35 @@
 package id.aria.notes.ui.fragments.list
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import id.aria.notes.R
 import id.aria.notes.data.models.Note
-import id.aria.notes.data.models.Priority
-import kotlinx.android.synthetic.main.item_list_note.view.*
+import id.aria.notes.databinding.ItemListNoteBinding
+import id.aria.notes.utils.NoteDiffUtil
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
-    private var dataList = emptyList<Note>()
+    var dataList = emptyList<Note>()
 
-    inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class MyViewHolder(private val binding: ItemListNoteBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(note: Note) {
+            binding.note = note
+            binding.executePendingBindings()
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): MyViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ItemListNoteBinding.inflate(layoutInflater, parent, false)
+                return MyViewHolder(binding)
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        return MyViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_list_note, parent, false)
-        )
+        return MyViewHolder.from(parent)
     }
 
     override fun getItemCount(): Int {
@@ -29,42 +38,13 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val note = dataList[position]
-
-        holder.itemView.apply {
-            txt_title.text = note.title
-            txt_description.text = note.description
-
-            when (note.priority) {
-                Priority.HIGH -> priorities.setCardBackgroundColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.red
-                    )
-                )
-                Priority.MEDIUM -> priorities.setCardBackgroundColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.yellow
-                    )
-                )
-                Priority.LOW -> priorities.setCardBackgroundColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.green
-                    )
-                )
-            }
-
-            setOnClickListener {
-                val action = ListFragmentDirections.actionListFragmentToUpdateFragment(note)
-                findNavController().navigate(action)
-            }
-        }
+        holder.bind(note)
     }
 
     fun setData(notes: List<Note>) {
+        val noteDiffUtil = NoteDiffUtil(dataList, notes)
+        val noteDiffUtilResult = DiffUtil.calculateDiff(noteDiffUtil)
         this.dataList = notes
-        notifyDataSetChanged()
+        noteDiffUtilResult.dispatchUpdatesTo(this)
     }
-
 }
