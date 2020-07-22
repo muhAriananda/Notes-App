@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import id.aria.notes.R
 import id.aria.notes.data.models.Note
-import id.aria.notes.data.viewmodels.NoteViewModel
-import id.aria.notes.data.viewmodels.SharedViewModel
+import id.aria.notes.data.viewmodel.NoteViewModel
+import id.aria.notes.data.viewmodel.SharedViewModel
 import id.aria.notes.databinding.FragmentUpdateBinding
 import kotlinx.android.synthetic.main.fragment_update.*
 

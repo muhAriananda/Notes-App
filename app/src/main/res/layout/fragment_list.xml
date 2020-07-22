@@ -7,7 +7,7 @@
 
         <variable
             name="mSharedViewModel"
-            type="id.aria.notes.data.viewmodels.SharedViewModel" />
+            type="id.aria.notes.data.viewmodel.SharedViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

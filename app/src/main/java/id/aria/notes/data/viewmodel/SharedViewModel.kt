@@ -1,4 +1,4 @@
-package id.aria.notes.data.viewmodels
+package id.aria.notes.data.viewmodel
 
 import android.app.Application
 import android.text.TextUtils

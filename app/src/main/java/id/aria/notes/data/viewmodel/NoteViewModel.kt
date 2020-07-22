@@ -1,4 +1,4 @@
-package id.aria.notes.data.viewmodels
+package id.aria.notes.data.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -17,9 +17,14 @@ class NoteViewModel(application: Application): AndroidViewModel(application) {
 
     val getAllNotes: LiveData<List<Note>>
 
+    val getNotesByHigh: LiveData<List<Note>>
+    val getNotesByLow: LiveData<List<Note>>
+
     init {
         repository = NoteRepository(noteDao)
-        getAllNotes = repository.getAllNote()
+        getAllNotes = repository.getAllNote
+        getNotesByHigh = repository.sortByHighNotes
+        getNotesByLow = repository.sortByLowNotes
     }
 
     fun insertNote(note: Note) {
@@ -44,5 +49,9 @@ class NoteViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAll()
         }
+    }
+
+    fun searchNote(searchQuery: String): LiveData<List<Note>> {
+        return repository.searchNotes(searchQuery)
     }
 }

@@ -6,7 +6,13 @@ import id.aria.notes.data.models.Note
 
 class NoteRepository(private val noteDao: NoteDao) {
 
-    fun getAllNote(): LiveData<List<Note>> = noteDao.getAllNotes()
+    val getAllNote: LiveData<List<Note>> = noteDao.getAllNotes()
+
+    val sortByHighNotes: LiveData<List<Note>> = noteDao.sortByHighPriority()
+
+    val sortByLowNotes: LiveData<List<Note>> = noteDao.sortByLowPriority()
+
+    fun searchNotes(searchQuery: String): LiveData<List<Note>> = noteDao.searchNotes(searchQuery)
 
     suspend fun insert(note: Note) {
         noteDao.insert(note)

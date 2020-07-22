@@ -1,7 +1,6 @@
 package id.aria.notes.ui.fragments.add
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -9,8 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import id.aria.notes.R
 import id.aria.notes.data.models.Note
-import id.aria.notes.data.viewmodels.NoteViewModel
-import id.aria.notes.data.viewmodels.SharedViewModel
+import id.aria.notes.data.viewmodel.NoteViewModel
+import id.aria.notes.data.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.fragment_add.*
 
 class AddFragment : Fragment() {

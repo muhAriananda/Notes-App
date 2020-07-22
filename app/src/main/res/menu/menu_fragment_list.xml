@@ -3,16 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_search"
         android:title="@string/search"
         android:icon="@drawable/ic_search"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
-    <group android:checkableBehavior="single">
+    <group>
         <item android:title="@string/sort_by">
             <menu>
-                <item android:title="@string/priority_high"/>
-                <item android:title="@string/priority_low"/>
+                <item
+                    android:id="@+id/menu_high_priority"
+                    android:title="@string/priority_high"/>
+                <item
+                    android:id="@+id/menu_low_priority"
+                    android:title="@string/priority_low"/>
             </menu>
         </item>
     </group>
